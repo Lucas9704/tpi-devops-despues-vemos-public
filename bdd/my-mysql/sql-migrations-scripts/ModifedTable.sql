@@ -1,0 +1,1 @@
+ALTER TABLE leccion ADD descripcion varchar(25);
