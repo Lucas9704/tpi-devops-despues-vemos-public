@@ -1,0 +1,210 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tp-devops-prod
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: tp-devops-prod
+  name: ingress-webapp
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /prod/api
+            pathType: Prefix
+            backend:
+              service:
+                name: service-back
+                port:
+                  number: 80
+          - path: /prod
+            pathType: Prefix
+            backend:
+              service:
+                name: service-front
+                port:
+                  number: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: tp-devops-prod
+  name: postgres
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: postgres
+  clusterIP: 10.96.0.100
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: tp-devops-prod
+  name: postgres
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - image: postgres
+          name: postgres
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: POSTGRES_PASSWORD
+          ports:
+            - containerPort: 5432
+              name: postgres
+          volumeMounts:
+            - name: postgres-persistent-storage
+              mountPath: /var/lib/postgresql/data
+              subPath: postgres
+      volumes:
+        - name: postgres-persistent-storage
+          hostPath:
+            path: /home/devops/postgres-prod
+            type: Directory
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+  namespace: tp-devops-prod
+type: Opaque
+data:
+  POSTGRES_DB: dHAtZGV2b3Bz
+  POSTGRES_USER: ZGV2b3Bz
+  POSTGRES_PASSWORD: ZGV2b3BzMjAyMA==
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: tp-devops-prod
+  name: service-back
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  selector:
+    app: webapp-back
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: tp-devops-prod
+  name: webapp-back
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webapp-back
+  template:
+    metadata:
+      labels:
+        app: webapp-back
+    spec:
+      containers:
+        - image: thelinkin3000/webapp-back:latest
+          imagePullPolicy: Always
+          name: webapp-back
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: endpoints
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: endpoints
+                  key: DB_PORT
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: POSTGRES_PASSWORD
+            - name: HOST_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: endpoints
+                  key: HOST_ENV
+          ports:
+            - containerPort: 80
+              name: webapp-back
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: tp-devops-prod
+  name: service-front
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  selector:
+    app: webapp-front
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: tp-devops-prod
+  name: webapp-front
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: webapp-front
+  template:
+    metadata:
+      labels:
+        app: webapp-front
+    spec:
+      containers:
+        - image: thelinkin3000/webapp-front:latest
+          imagePullPolicy: Always
+          name: webapp-front
+          ports:
+            - containerPort: 80
+              name: webapp-front
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: tp-devops-prod
+  name: endpoints
+data:
+  DB_HOST: '10.96.0.100'
+  DB_PORT: '5432'
+  HOST_ENV: 'prod'

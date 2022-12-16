@@ -1,4 +1,4 @@
-FROM node:16.4-alpine3.14
+FROM node:lts-alpine as build
 
 WORKDIR /app 
 
@@ -8,6 +8,12 @@ RUN npm install
 
 COPY . .
 
-CMD ["npm", "start"]
+RUN npm run build
+
+FROM node:lts-alpine
+
+COPY --from=build /app/dist ./build
+
+CMD ["node", "build/final.js"]
 
 EXPOSE 9000
