@@ -21,10 +21,10 @@ pipeline {
                 stage('Back-end') {
                     steps {
                         echo 'Building back-end...'
-                        container('podman') {
+                        container('docker') {
                             script {
-                                webappBack = podman.build("${dockerhubUsername}/tpidevopsdespuesvemospublic-back:${BUILD_NUMBER}", "./backend")
-                                podman.withRegistry('', registryCredential) { 
+                                webappBack = docker.build("${dockerhubUsername}/tpidevopsdespuesvemospublic-back:${BUILD_NUMBER}", "./backend")
+                                docker.withRegistry('', registryCredential) { 
                                     if (env.BRANCH_NAME == 'main') {
                                         webappBack.push('latest')
                                     }
@@ -40,17 +40,17 @@ pipeline {
                 stage('Front-end') {
                     steps {
                         echo 'Building front-end...'
-                        container('podman') {
+                        container('docker') {
                             script {
                                 if (env.BRANCH_NAME == 'main') {
-                                    webappFront = podman.build("${dockerhubUsername}/tpidevopsdespuesvemospublic-front:${BUILD_NUMBER}", "--build-arg STAGE=prod ./frontend")
-                                    podman.withRegistry('', registryCredential) {
+                                    webappFront = docker.build("${dockerhubUsername}/tpidevopsdespuesvemospublic-front:${BUILD_NUMBER}", "--build-arg STAGE=prod ./frontend")
+                                    docker.withRegistry('', registryCredential) {
                                         webappFront.push('latest')
                                     }
                                 }
                                 if (env.BRANCH_NAME == 'dev') {
                                     webappFront = docker.build("${dockerhubUsername}/webapp-front:${BUILD_NUMBER}", "--build-arg STAGE=dev ./frontend")
-                                    podman.withRegistry('', registryCredential) {
+                                    docker.withRegistry('', registryCredential) {
                                         webappFront.push()
                                         webappFront.push('dev')
                                     }
