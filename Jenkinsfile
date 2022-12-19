@@ -43,8 +43,8 @@ pipeline {
                         container('podman') {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
-                                sh 'cd backend && podman build -t tpidevopsdespuesvemospublic-back .'
-                                webappBackPodman = sh(returnStdout: true, script: 'podman build -t tpidevopsdespuesvemospublic-back .').trim()
+                                sh 'cd backend'
+                                webappBackPodman = sh 'podman build -t tpidevopsdespuesvemospublic-back .'
                                 if (env.BRANCH_NAME == 'main') {
                                     sh 'podman push ${webappBackPodman} docker.io/${dockerhubUsername}/tpidevopsdespuesvemospublic-back:latest'
                                 }
@@ -80,12 +80,12 @@ pipeline {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
                                 sh 'cd frontend'
                                 if (env.BRANCH_NAME == 'main') {
-                                    webappFrontPodman = sh(returnStdout: true, script: 'podman build -t tpidevopsdespuesvemospublic-front:${BUILD_NUMBER} --build-arg=STAGE=prod .').trim()
-                                    sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/tpidevopsdespuesvemospublic-front:latest'
+                                    webappFrontPodman = sh 'podman build -t tpidevopsdespuesvemospublic-front:${BUILD_NUMBER} --build-arg=STAGE=prod .'
+                                    sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:latest'
                                 }
                                 if (env.BRANCH_NAME == 'dev') {
-                                    webappFrontPodman = sh(returnStdout: true, script: 'podman build -t tpidevopsdespuesvemospublic-front:${BUILD_NUMBER} --build-arg=STAGE=dev .').trim()
-                                    sh 'podman push ${webappFrontPodman} docker.io/${cronozok}/tpidevopsdespuesvemospublic-front:dev'
+                                    webappFrontPodman = 'podman build -t tpidevopsdespuesvemospublic-front:${BUILD_NUMBER} --build-arg=STAGE=dev .'
+                                    sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:dev'
                                 }
                             }
                         }
