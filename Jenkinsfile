@@ -43,8 +43,7 @@ pipeline {
                         container('podman') {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
-                                sh 'cd backend'
-                                sh 'podman build -t ${webappBackPodman}${BUILD_NUMBER} .'
+                                sh 'cd backend && podman build -t ${webappBackPodman}${BUILD_NUMBER} .'
                                 if (env.BRANCH_NAME == 'main') {
                                     sh 'podman push ${webappBackPodman} docker.io/${dockerhubUsername}/${webappBackPodman}:latest'
                                 }
@@ -78,13 +77,12 @@ pipeline {
                         container('podman') {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
-                                sh 'cd frontend'
                                 if (env.BRANCH_NAME == 'main') {
-                                    sh 'podman build -t ${webappFrontPodman}${BUILD_NUMBER} --build-arg=STAGE=prod .'
+                                    sh 'cd frontend && podman build -t ${webappFrontPodman}${BUILD_NUMBER} --build-arg=STAGE=prod .'
                                     sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:latest'
                                 }
                                 if (env.BRANCH_NAME == 'dev') {
-                                    sh 'podman build -t ${webappFrontPodman}${BUILD_NUMBER} --build-arg=STAGE=dev .'
+                                    sh 'cd frontend && podman build -t ${webappFrontPodman}${BUILD_NUMBER} --build-arg=STAGE=dev .'
                                     sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:dev'
                                 }
                             }
