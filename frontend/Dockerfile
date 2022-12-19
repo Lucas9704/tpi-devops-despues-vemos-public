@@ -6,11 +6,13 @@ WORKDIR /usr/src/app
 
 COPY ["package.json", "package-lock.json*", "./"]
 
+ARG STAGE
+
 RUN npm install
 
 COPY . .
 
-RUN npm run build
+RUN npm run build -- --output-path=./build --configuration $STAGE
 
 FROM nginx:1.21-alpine
 
