@@ -44,7 +44,7 @@ pipeline {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
                                 sh 'cd backend'
-                                webappBackPodman = sh(returnStdout: true, script: 'echo tpidevopsdespuesvemospublic-back:${BUILD_NUMBER}').trim()
+                                sh 'echo ${webappBackPodman:=tpidevopsdespuesvemospublic-back:${BUILD_NUMBER}}'
                                 sh 'podman build -t ${webappBackPodman} .'
                                 if (env.BRANCH_NAME == 'main') {
                                     sh 'podman push ${webappBackPodman} docker.io/${dockerhubUsername}/${webappBackPodman}:latest'
@@ -80,7 +80,7 @@ pipeline {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
                                 sh 'cd frontend'
-                                webappFrontPodman = sh(returnStdout: true, script: 'echo tpidevopsdespuesvemospublic-front:${BUILD_NUMBER}').trim()
+                                sh 'echo ${webappBackPodman:=tpidevopsdespuesvemospublic-back:${BUILD_NUMBER}}'
                                 if (env.BRANCH_NAME == 'main') {
                                     sh 'podman build -t ${webappFrontPodman} --build-arg=STAGE=prod .'
                                     sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:latest'
