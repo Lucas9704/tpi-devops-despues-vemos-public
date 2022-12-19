@@ -42,8 +42,9 @@ pipeline {
                         } */
                         container('podman') {
                             script {
-                                webappBackPodman = sh(returnStdout: true, script: 'podman build -t tpidevopsdespuesvemospublic-back ./backend').trim()
                                 sh 'podman login -u cronozok -p amolamusicas1 docker.io'
+                                sh 'cd backend && podman build -t tpidevopsdespuesvemospublic-back .'
+                                webappBackPodman = sh(returnStdout: true, script: 'podman build -t tpidevopsdespuesvemospublic-back .').trim()
                                 if (env.BRANCH_NAME == 'main') {
                                     sh 'podman push ${webappBackPodman} docker.io/cronozok/tpidevopsdespuesvemospublic-back:latest'
                                 }
