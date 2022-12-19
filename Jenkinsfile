@@ -8,8 +8,8 @@ pipeline {
         kubernetesToken = credentials('k8s-token')
         dockerhubUsername = "cronozok"
         registryCredential = "dockerhub_id"	
-        webappBack = ""
-        webappFront = ""
+        webappBack = 'tpidevopsdespuesvemospublic-back:'
+        webappFront = 'tpidevopsdespuesvemospublic-front:'
         webappBackPodman = 'tpidevopsdespuesvemospublic-back:'
         webappFrontPodman = 'tpidevopsdespuesvemospublic-front:'
         dockerhubPassword = credentials('dockerhub_password')
@@ -26,9 +26,9 @@ pipeline {
                 stage('Back-end') {
                     steps {
                         echo 'Building back-end...'
-                        /* container('docker') {
+                        container('docker') {
                             script {
-                                webappBack = docker.build("${dockerhubUsername}/tpidevopsdespuesvemospublic-back:${BUILD_NUMBER}", "./backend")
+                                webappBack = docker.build("${dockerhubUsername}/${webappBack}${BUILD_NUMBER}", "./backend")
                                 docker.withRegistry('https://registry.hub.docker.com', registryCredential) { 
                                     if (env.BRANCH_NAME == 'main') {
                                         webappBack.push('latest')
@@ -39,8 +39,8 @@ pipeline {
                                     }
                                 }
                             }
-                        } */
-                        container('podman') {
+                        }
+                        /* container('podman') {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
                                 sh 'cd backend && podman build -t ${webappBackPodman}${BUILD_NUMBER} .'
@@ -51,30 +51,30 @@ pipeline {
                                     sh 'podman push ${webappBackPodman} docker.io/${dockerhubUsername}/${webappBackPodman}:dev'
                                 }
                             }
-                        }
+                        } */
                     }
                 }
                 stage('Front-end') {
                     steps {
                         echo 'Building front-end...'
-                        /* container('docker') {
+                        container('docker') {
                             script {
                                 if (env.BRANCH_NAME == 'main') {
-                                    webappFront = docker.build("${dockerhubUsername}/tpidevopsdespuesvemospublic-front:${BUILD_NUMBER}", "--build-arg STAGE=prod ./frontend")
+                                    webappFront = docker.build("${dockerhubUsername}/${webappFront}${BUILD_NUMBER}", "--build-arg STAGE=prod ./frontend")
                                     docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
                                         webappFront.push('latest')
                                     }
                                 }
                                 if (env.BRANCH_NAME == 'dev') {
-                                    webappFront = docker.build("${dockerhubUsername}/webapp-front:${BUILD_NUMBER}", "--build-arg STAGE=dev ./frontend")
+                                    webappFront = docker.build("${dockerhubUsername}/${webappFront}${BUILD_NUMBER}", "--build-arg STAGE=dev ./frontend")
                                     docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
                                         webappFront.push()
                                         webappFront.push('dev')
                                     }
                                 }
                             }
-                        } */
-                        container('podman') {
+                        }
+                        /* container('podman') {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
                                 if (env.BRANCH_NAME == 'main') {
@@ -86,7 +86,7 @@ pipeline {
                                     sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:dev'
                                 }
                             }
-                        }
+                        } */
                     }
                 }
             }
