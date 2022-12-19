@@ -12,7 +12,7 @@ pipeline {
         webappFront = ""
         webappBackPodman = ""
         webappFrontPodman = ""
-        dockerhubPassword = 'dockerhub_password'
+        dockerhubPassword = credentials('dockerhub_password')
 		/* db_host_prod = credentials('db_host_prod')
 		db_host_dev = credentials('db_host_dev')
 		db_port = credentials('db_port')
