@@ -42,14 +42,14 @@ pipeline {
                         } */
                         container('podman') {
                             script {
-                                webappBackPodman = sh(returnStdout: true, script: 'podman build -q ./backend').trim()
+                                webappBackPodman = sh(returnStdout: true, script: 'sudo podman build -q ./backend').trim()
                                 if (env.BRANCH_NAME == 'main') {
-                                    sh 'podman login -u cronozok -p ${dockerhubPassword} docker.io'
-                                    sh 'podman push ${webappBackPodman} docker.io/cronozok/tpidevopsdespuesvemospublic-back:latest'
+                                    sh 'sudo podman login -u cronozok -p ${dockerhubPassword} docker.io'
+                                    sh 'sudo podman push ${webappBackPodman} docker.io/cronozok/tpidevopsdespuesvemospublic-back:latest'
                                 }
                                 if (env.BRANCH_NAME == 'dev') {
-                                    sh 'podman login -u cronozok -p ${dockerhubPassword} docker.io'
-                                    sh 'podman push ${webappBackPodman} docker.io/cronozok/tpidevopsdespuesvemospublic-back:dev'
+                                    sh 'sudo podman login -u cronozok -p ${dockerhubPassword} docker.io'
+                                    sh 'sudo podman push ${webappBackPodman} docker.io/cronozok/tpidevopsdespuesvemospublic-back:dev'
                                 }
                             }
                         }
