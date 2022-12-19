@@ -10,8 +10,8 @@ pipeline {
         registryCredential = "dockerhub_id"	
         webappBack = ""
         webappFront = ""
-        webappBackPodman = ''
-        webappFrontPodman = ''
+        webappBackPodman = 'tpidevopsdespuesvemospublic-back:'
+        webappFrontPodman = 'tpidevopsdespuesvemospublic-front:'
         dockerhubPassword = credentials('dockerhub_password')
 		/* db_host_prod = credentials('db_host_prod')
 		db_host_dev = credentials('db_host_dev')
@@ -44,8 +44,7 @@ pipeline {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
                                 sh 'cd backend'
-                                sh 'echo ${webappBackPodman:=tpidevopsdespuesvemospublic-back:${BUILD_NUMBER}}'
-                                sh 'podman build -t ${webappBackPodman} .'
+                                sh 'podman build -t ${webappBackPodman}${BUILD_NUMBER} .'
                                 if (env.BRANCH_NAME == 'main') {
                                     sh 'podman push ${webappBackPodman} docker.io/${dockerhubUsername}/${webappBackPodman}:latest'
                                 }
@@ -80,13 +79,12 @@ pipeline {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
                                 sh 'cd frontend'
-                                sh 'echo ${webappBackPodman:=tpidevopsdespuesvemospublic-back:${BUILD_NUMBER}}'
                                 if (env.BRANCH_NAME == 'main') {
-                                    sh 'podman build -t ${webappFrontPodman} --build-arg=STAGE=prod .'
+                                    sh 'podman build -t ${webappFrontPodman}${BUILD_NUMBER} --build-arg=STAGE=prod .'
                                     sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:latest'
                                 }
                                 if (env.BRANCH_NAME == 'dev') {
-                                    sh 'podman build -t ${webappFrontPodman} --build-arg=STAGE=dev .'
+                                    sh 'podman build -t ${webappFrontPodman}${BUILD_NUMBER} --build-arg=STAGE=dev .'
                                     sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:dev'
                                 }
                             }
