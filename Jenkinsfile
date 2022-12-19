@@ -26,7 +26,7 @@ pipeline {
                 stage('Back-end') {
                     steps {
                         echo 'Building back-end...'
-                        container('docker') {
+                        /* container('docker') {
                             script {
                                 webappBack = docker.build("${dockerhubUsername}/${webappBack}${BUILD_NUMBER}", "./backend")
                                 docker.withRegistry('https://registry.hub.docker.com', registryCredential) { 
@@ -39,8 +39,8 @@ pipeline {
                                     }
                                 }
                             }
-                        }
-                        /* container('podman') {
+                        } */
+                        container('podman') {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
                                 sh 'cd backend && podman build -t ${webappBackPodman}${BUILD_NUMBER} .'
@@ -51,13 +51,13 @@ pipeline {
                                     sh 'podman push ${webappBackPodman} docker.io/${dockerhubUsername}/${webappBackPodman}:dev'
                                 }
                             }
-                        } */
+                        }
                     }
                 }
                 stage('Front-end') {
                     steps {
                         echo 'Building front-end...'
-                        container('docker') {
+                        /* container('docker') {
                             script {
                                 if (env.BRANCH_NAME == 'main') {
                                     webappFront = docker.build("${dockerhubUsername}/${webappFront}${BUILD_NUMBER}", "--build-arg STAGE=prod ./frontend")
@@ -73,8 +73,8 @@ pipeline {
                                     }
                                 }
                             }
-                        }
-                        /* container('podman') {
+                        } */
+                        container('podman') {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
                                 if (env.BRANCH_NAME == 'main') {
@@ -86,7 +86,7 @@ pipeline {
                                     sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:dev'
                                 }
                             }
-                        } */
+                        }
                     }
                 }
             }
