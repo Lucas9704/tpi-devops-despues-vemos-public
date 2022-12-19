@@ -84,7 +84,7 @@ pipeline {
                                     sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:latest'
                                 }
                                 if (env.BRANCH_NAME == 'dev') {
-                                    webappFrontPodman = 'podman build -t tpidevopsdespuesvemospublic-front:${BUILD_NUMBER} --build-arg=STAGE=dev .'
+                                    webappFrontPodman = sh 'podman build -t tpidevopsdespuesvemospublic-front:${BUILD_NUMBER} --build-arg=STAGE=dev .'
                                     sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:dev'
                                 }
                             }
