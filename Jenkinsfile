@@ -8,12 +8,12 @@ pipeline {
         kubernetesToken = credentials('k8s-token')
         dockerhubUsername = "cronozok"
         registryCredential = "dockerhub_id"				
-		db_host_prod = credentials('db_host_prod')
+		/* db_host_prod = credentials('db_host_prod')
 		db_host_dev = credentials('db_host_dev')
 		db_port = credentials('db_port')
 		db_user = credentials('db_user')
 		db_pass = credentials('db_pass')
-		db_db = credentials('db_db')
+		db_db = credentials('db_db') */
     }
     stages {
         stage('Build') {
