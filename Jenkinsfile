@@ -23,7 +23,7 @@ pipeline {
                         echo 'Building back-end...'
                         container('podman') {
                             script {
-                                webappBack = podman.build("${dockerhubUsername}/tpidevopsdespuesvemospublic-back:${BUILD_NUMBER}", "./tpidevopsdespuesvemospublic-back")
+                                webappBack = podman.build("${dockerhubUsername}/tpidevopsdespuesvemospublic-back:${BUILD_NUMBER}", "./backend")
                                 podman.withRegistry('', registryCredential) { 
                                     if (env.BRANCH_NAME == 'main') {
                                         webappBack.push('latest')
@@ -43,13 +43,13 @@ pipeline {
                         container('podman') {
                             script {
                                 if (env.BRANCH_NAME == 'main') {
-                                    webappFront = podman.build("${dockerhubUsername}/tpidevopsdespuesvemospublic-front:${BUILD_NUMBER}", "--build-arg STAGE=prod ./tpidevopsdespuesvemospublic-front")
+                                    webappFront = podman.build("${dockerhubUsername}/tpidevopsdespuesvemospublic-front:${BUILD_NUMBER}", "--build-arg STAGE=prod ./frontend")
                                     podman.withRegistry('', registryCredential) {
                                         webappFront.push('latest')
                                     }
                                 }
                                 if (env.BRANCH_NAME == 'dev') {
-                                    webappFront = docker.build("${dockerhubUsername}/webapp-front:${BUILD_NUMBER}", "--build-arg STAGE=dev ./tpidevopsdespuesvemospublic-front")
+                                    webappFront = docker.build("${dockerhubUsername}/webapp-front:${BUILD_NUMBER}", "--build-arg STAGE=dev ./frontend")
                                     podman.withRegistry('', registryCredential) {
                                         webappFront.push()
                                         webappFront.push('dev')
