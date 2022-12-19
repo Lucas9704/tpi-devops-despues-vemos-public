@@ -1,19 +1,11 @@
 FROM node:lts-alpine as build
-
 WORKDIR /app 
-
 COPY package*.json ./
-
 RUN npm install
-
 COPY . .
-
 RUN npm run build
 
-FROM node:lts-alpine
-
-COPY --from=build /app/dist ./build
-
-CMD ["node", "build/final.js"]
-
+FROM nginx:1.21-alpine
+COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /usr/src/app/build /usr/share/nginx/html
 EXPOSE 9000
