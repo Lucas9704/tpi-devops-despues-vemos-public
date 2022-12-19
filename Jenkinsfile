@@ -7,7 +7,12 @@ pipeline {
         kubernetesServer = "https://10.0.2.15:6443"
         kubernetesToken = credentials('k8s-token')
         dockerhubUsername = "cronozok"
-        registryCredential = "dockerhub_id"				
+        registryCredential = "dockerhub_id"	
+        webappBack = ""
+        webappFront = ""
+        webappBackPodman = ""
+        webappFrontPodman = ""
+        dockerhubPassword = credentials('dockerhub_password')
 		/* db_host_prod = credentials('db_host_prod')
 		db_host_dev = credentials('db_host_dev')
 		db_port = credentials('db_port')
@@ -24,7 +29,7 @@ pipeline {
                         container('docker') {
                             script {
                                 webappBack = docker.build("${dockerhubUsername}/tpidevopsdespuesvemospublic-back:${BUILD_NUMBER}", "./backend")
-                                docker.withRegistry('', registryCredential) { 
+                                docker.withRegistry('https://registry.hub.docker.com', registryCredential) { 
                                     if (env.BRANCH_NAME == 'main') {
                                         webappBack.push('latest')
                                     }
@@ -32,6 +37,19 @@ pipeline {
                                         webappBack.push()
                                         webappBack.push('dev')
                                     }
+                                }
+                            }
+                        }
+                        container('podman') {
+                            script {
+                                webappBackPodman = sh(returnStdout: true, script: 'podman build -q ./backend').trim()
+                                if (env.BRANCH_NAME == 'main') {
+                                    sh 'podman login -u cronozok -p ${dockerhubPassword} docker.io'
+                                    sh 'podman push ${webappBackPodman} docker.io/cronozok/tpidevopsdespuesvemospublic-back:latest'
+                                }
+                                if (env.BRANCH_NAME == 'dev') {
+                                    sh 'podman login -u cronozok -p ${dockerhubPassword} docker.io'
+                                    sh 'podman push ${webappBackPodman} docker.io/cronozok/tpidevopsdespuesvemospublic-back:dev'
                                 }
                             }
                         }
@@ -44,13 +62,13 @@ pipeline {
                             script {
                                 if (env.BRANCH_NAME == 'main') {
                                     webappFront = docker.build("${dockerhubUsername}/tpidevopsdespuesvemospublic-front:${BUILD_NUMBER}", "--build-arg STAGE=prod ./frontend")
-                                    docker.withRegistry('', registryCredential) {
+                                    docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
                                         webappFront.push('latest')
                                     }
                                 }
                                 if (env.BRANCH_NAME == 'dev') {
                                     webappFront = docker.build("${dockerhubUsername}/webapp-front:${BUILD_NUMBER}", "--build-arg STAGE=dev ./frontend")
-                                    docker.withRegistry('', registryCredential) {
+                                    docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
                                         webappFront.push()
                                         webappFront.push('dev')
                                     }
