@@ -26,7 +26,7 @@ pipeline {
                 stage('Back-end') {
                     steps {
                         echo 'Building back-end...'
-                        container('docker') {
+                        /* container('docker') {
                             script {
                                 webappBack = docker.build("${dockerhubUsername}/tpidevopsdespuesvemospublic-back:${BUILD_NUMBER}", "./backend")
                                 docker.withRegistry('https://registry.hub.docker.com', registryCredential) { 
@@ -39,7 +39,7 @@ pipeline {
                                     }
                                 }
                             }
-                        }
+                        } */
                         container('podman') {
                             script {
                                 webappBackPodman = sh(returnStdout: true, script: 'podman build -q ./backend').trim()
@@ -58,7 +58,7 @@ pipeline {
                 stage('Front-end') {
                     steps {
                         echo 'Building front-end...'
-                        container('docker') {
+                        /* container('docker') {
                             script {
                                 if (env.BRANCH_NAME == 'main') {
                                     webappFront = docker.build("${dockerhubUsername}/tpidevopsdespuesvemospublic-front:${BUILD_NUMBER}", "--build-arg STAGE=prod ./frontend")
@@ -74,7 +74,7 @@ pipeline {
                                     }
                                 }
                             }
-                        }
+                        } */
                     }
                 }
             }
