@@ -1,4 +1,4 @@
-FROM node:lts as build
+FROM node:lts-alpine as build
 ENV API=http://localhost:9000/api
 WORKDIR /usr/src/app
 COPY . .
