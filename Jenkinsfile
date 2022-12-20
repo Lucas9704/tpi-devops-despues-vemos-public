@@ -80,7 +80,7 @@ pipeline {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
                                 sh 'podman network create'
                                 if (env.BRANCH_NAME == 'main') {
-                                    sh 'cd frontend && podman build -t ${webappFrontPodman}${BUILD_NUMBER} --build-arg=STAGE=prod .'
+                                    sh 'cd frontend && podman build -t ${webappFrontPodman}${BUILD_NUMBER} --dns 10.0.2.15 --build-arg=STAGE=prod .'
                                     sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:latest'
                                 }
                                 if (env.BRANCH_NAME == 'dev') {
