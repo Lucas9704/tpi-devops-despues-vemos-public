@@ -44,7 +44,6 @@ pipeline {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
                                 sh 'podman network create'
-                                sh 'podman network inspect podman | jq .[] > /etc/podman.json'
                                 sh 'cd backend && podman build -t ${webappBackPodman}${BUILD_NUMBER} .'
                                 if (env.BRANCH_NAME == 'main') {
                                     sh 'podman push ${webappBackPodman} docker.io/${dockerhubUsername}/${webappBackPodman}:latest'
@@ -80,7 +79,6 @@ pipeline {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
                                 sh 'podman network create'
-                                sh 'podman network inspect podman | jq .[] > /etc/podman.json'
                                 if (env.BRANCH_NAME == 'main') {
                                     sh 'cd frontend && podman build -t ${webappFrontPodman}${BUILD_NUMBER} --build-arg=STAGE=prod .'
                                     sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:latest'
