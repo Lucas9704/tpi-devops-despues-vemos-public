@@ -7,7 +7,7 @@ pipeline {
         kubernetesServer = "https://10.0.2.15:6443"
         kubernetesToken = credentials('k8s-token')
         dockerhubUsername = "cronozok"
-        registryCredential = "dockerhub_id"	
+        registryCredential = "dockerhub_id"
         webappBack = 'tpidevopsdespuesvemospublic-back:'
         webappFront = 'tpidevopsdespuesvemospublic-front:'
         webappBackPodman = 'tpidevopsdespuesvemospublic-back:'
@@ -44,7 +44,7 @@ pipeline {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
                                 sh 'podman network create'
-                                sh 'cd backend && podman build -t ${webappBackPodman}${BUILD_NUMBER} .'
+                                sh 'cd backend && podman build --dns 8.8.8.8 -t ${webappBackPodman}${BUILD_NUMBER} .'
                                 if (env.BRANCH_NAME == 'main') {
                                     sh 'podman push ${webappBackPodman} docker.io/${dockerhubUsername}/${webappBackPodman}:latest'
                                 }
@@ -80,7 +80,7 @@ pipeline {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
                                 sh 'podman network create'
                                 if (env.BRANCH_NAME == 'main') {
-                                    sh 'cd frontend && podman build -t ${webappFrontPodman}${BUILD_NUMBER} --build-arg=STAGE=prod .'
+                                    sh 'cd frontend && podman build -t ${webappFrontPodman}${BUILD_NUMBER} --dns 8.8.8.8 --build-arg=STAGE=prod .'
                                     sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:latest'
                                 }
                                 if (env.BRANCH_NAME == 'dev') {
