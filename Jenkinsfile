@@ -79,6 +79,8 @@ pipeline {
                         container('podman') {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
+                                sh 'podman network create'
+                                sh 'podman network inspect podman | jq .[] > /etc/containers/networks/podman.json'
                                 if (env.BRANCH_NAME == 'main') {
                                     sh 'cd frontend && podman build -t ${webappFrontPodman}${BUILD_NUMBER} --build-arg=STAGE=prod .'
                                     sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:latest'
