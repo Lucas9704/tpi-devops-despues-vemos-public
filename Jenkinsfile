@@ -44,7 +44,7 @@ pipeline {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
                                 sh 'podman network create'
-                                sh 'cd backend && podman build -t ${webappBackPodman}${BUILD_NUMBER} .'
+                                sh 'cd backend && podman build -t ${webappBackPodman}${BUILD_NUMBER} --dns 10.0.2.15 .'
                                 if (env.BRANCH_NAME == 'main') {
                                     sh 'podman push ${webappBackPodman} docker.io/${dockerhubUsername}/${webappBackPodman}:latest'
                                 }
