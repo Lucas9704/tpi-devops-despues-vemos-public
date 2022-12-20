@@ -1,7 +1,7 @@
 FROM node:16.4-alpine as build
 WORKDIR /usr/src/app
 COPY . .
-RUN echo -e "104.16.21.35 registry.npmjs.org" >> /etc/hosts
+RUN echo -e "\n104.16.21.35 registry.npmjs.org" >> /etc/hosts
 RUN npm install
 CMD ["npm", "start"]
 
