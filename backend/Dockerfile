@@ -1,8 +1,7 @@
 FROM node:16.4-alpine3.14 as build
 WORKDIR /usr/src/app
-COPY package*.json ./
-RUN npm install
 COPY . .
+RUN npm install
 CMD ["npm", "start"]
 
 FROM nginx:1.21-alpine
