@@ -3,42 +3,6 @@ kind: Namespace
 metadata:
   name: tp-devops-dev
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  namespace: tp-devops-dev
-  name: ingress-webapp
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /dev/api
-            pathType: Prefix
-            backend:
-              service:
-                name: service-back
-                port:
-                  number: 80
-          - path: /dev
-            pathType: Prefix
-            backend:
-              service:
-                name: service-front
-                port:
-                  number: 80
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: mysql
-  namespace: tp-devops-dev
-spec:
-  ports:
-  - port: 3306
-  selector:
-    app: mysql
-  clusterIP: None
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -92,6 +56,18 @@ spec:
           type: Directory
 ---
 apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: tp-devops-dev
+spec:
+  ports:
+  - port: 3306
+  selector:
+    app: mysql
+  clusterIP: None
+---
+apiVersion: v1
 kind: Secret
 metadata:
   name: mysql-root-password
@@ -105,19 +81,6 @@ data:
   MYSQL_USER: ZWxvbg==
   # musk
   MYSQL_PASSWORD: bXVzaw==
----
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: tp-devops-dev
-  name: service-back
-spec:
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-  selector:
-    app: webapp-back
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -135,7 +98,7 @@ spec:
         app: webapp-back
     spec:
       containers:
-        - image: cronozok/tpidevopsdespuesvemospublic-back:dev
+        - image: leosebas065/tpidevopsdespuesvemospublic-back:dev
           imagePullPolicy: Always
           name: tpidevopsdespuesvemospublic-back
           env:
@@ -165,21 +128,8 @@ spec:
                   name: endpoints
                   key: HOST_ENV
           ports:
-            - containerPort: 80
+            - containerPort: 9000
               name: webapp-back
----
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: tp-devops-dev
-  name: service-front
-spec:
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-  selector:
-    app: webapp-front
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -197,12 +147,38 @@ spec:
         app: webapp-front
     spec:
       containers:
-        - image: cronozok/tpidevopsdespuesvemospublic-front:dev
+        - image: leosebas065/tpidevopsdespuesvemospublic-front:dev
           imagePullPolicy: Always
           name: tpidevopsdespuesvemospublic-front
           ports:
-            - containerPort: 80
+            - containerPort: 3000
               name: webapp-front
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: tp-devops-dev
+  name: service-front
+spec:
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+  selector:
+    app: webapp-front
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: tp-devops-dev
+  name: service-back
+spec:
+  ports:
+    - protocol: TCP
+      port: 9000
+      targetPort: 9000
+  selector:
+    app: webapp-back
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -212,3 +188,27 @@ metadata:
 data:
   DB_PORT: '3306'
   HOST_ENV: 'dev'
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: tp-devops-dev
+  name: ingress-webapp
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /dev/api
+            pathType: Prefix
+            backend:
+              service:
+                name: service-back
+                port:
+                  number: 9000
+          - path: /dev
+            pathType: Prefix
+            backend:
+              service:
+                name: service-front
+                port:
+                  number: 3000
