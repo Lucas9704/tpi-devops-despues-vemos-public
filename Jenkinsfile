@@ -19,6 +19,28 @@ pipeline {
 		db_db = credentials('db_db') */
     }
     stages {
+        stage('BuildProjects') {
+            parallel {
+                stage('Back-End') {
+                    steps {
+                        container('node') {
+                            script {
+                                sh 'cd backend && npm i && npm run build'
+                            }
+                        }
+                    }
+                }
+                stage('Front-End') {
+                    steps {
+                        container('node') {
+                            script {
+                                sh 'cd frontend && npm i && npm run build'
+                            }
+                        }
+                    }
+                }
+            }
+        }
         stage('Build') {
             parallel {
                 stage('Back-end') {
@@ -27,7 +49,7 @@ pipeline {
                         container('podman') {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
-                                sh 'cd backend && npm i && npm run build && podman build -t ${webappBackPodman}${BUILD_NUMBER} .'
+                                sh 'cd backend && podman build -t ${webappBackPodman}${BUILD_NUMBER} .'
                                 if (env.BRANCH_NAME == 'main') {
                                     sh 'podman push ${webappBackPodman} docker.io/${dockerhubUsername}/${webappBackPodman}:latest'
                                 }
@@ -45,11 +67,11 @@ pipeline {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'                                
                                 if (env.BRANCH_NAME == 'main') {
-                                    sh 'cd frontend && npm i && npm run build && podman build -t ${webappFrontPodman}${BUILD_NUMBER} --build-arg=STAGE=prod .'
+                                    sh 'cd frontend && podman build -t ${webappFrontPodman}${BUILD_NUMBER} .'
                                     sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:latest'
                                 }
                                 if (env.BRANCH_NAME == 'dev') {
-                                    sh 'cd frontend && npm i && npm run build && podman build -t ${webappFrontPodman}${BUILD_NUMBER} --build-arg=STAGE=dev .'
+                                    sh 'cd frontend && podman build -t ${webappFrontPodman}${BUILD_NUMBER} .'
                                     sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:dev'
                                 }
                             }
