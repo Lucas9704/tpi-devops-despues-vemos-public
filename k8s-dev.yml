@@ -160,12 +160,13 @@ metadata:
   namespace: tp-devops-dev
   name: service-front
 spec:
+  type: ClusterIP
+  selector:
+    app: webapp-front
   ports:
     - protocol: TCP
       port: 3000
       targetPort: 3000
-  selector:
-    app: webapp-front
 ---
 apiVersion: v1
 kind: Service
@@ -194,6 +195,8 @@ kind: Ingress
 metadata:
   namespace: tp-devops-dev
   name: ingress-webapp
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /dev
 spec:
   rules:
     - http:
