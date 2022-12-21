@@ -70,7 +70,7 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: mysql-root-password
+  name: db-credentials
   namespace: tp-devops-dev
 type: Opaque
 data:
@@ -81,6 +81,15 @@ data:
   MYSQL_USER: ZWxvbg==
   # musk
   MYSQL_PASSWORD: bXVzaw==
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: tp-devops-dev
+  name: endpoints
+data:
+  DB_PORT: '3306'
+  HOST_ENV: 'dev'
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -180,15 +189,6 @@ spec:
       targetPort: 9000
   selector:
     app: webapp-back
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  namespace: tp-devops-dev
-  name: endpoints
-data:
-  DB_PORT: '3306'
-  HOST_ENV: 'dev'
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
