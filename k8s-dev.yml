@@ -107,7 +107,7 @@ spec:
         app: webapp-back
     spec:
       containers:
-        - image: docker.io/leosebas065/tpidevopsdespuesvemospublic-back:dev
+        - image: docker.io/leosebas065/tpidevopsdespuesvemospublic-back
           imagePullPolicy: Always
           name: tpidevopsdespuesvemospublic-back
           env:
@@ -198,6 +198,7 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /dev
 spec:
+  ingressClassName: nginx-front
   rules:
     - http:
         paths:
