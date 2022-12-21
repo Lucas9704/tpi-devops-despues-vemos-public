@@ -2,9 +2,5 @@ FROM node:lts as build
 WORKDIR /usr/src/app
 COPY . .
 RUN npm install
-CMD ["npm", "start"]
-
-FROM nginx:1.21-alpine
-COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /usr/src/app/ /usr/share/nginx/html
+CMD node server.js
 EXPOSE 9000
