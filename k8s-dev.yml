@@ -76,7 +76,7 @@ type: Opaque
 data:
   MYSQL_ROOT_PASSWORD: password
   # devops
-  MYSQL_DATABASE: prueba
+  MYSQL_DATABASE: cHJ1ZWJh
   # elon
   MYSQL_USER: ZWxvbg==
   # musk
