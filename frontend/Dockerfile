@@ -1,10 +1,6 @@
 FROM node:lts as build
-ENV API=http://localhost:9000/api
 WORKDIR /usr/src/app
-COPY . .
-ARG STAGE
-RUN npm install
-RUN npm run build ${STAGE}
+COPY /build .
 
 FROM nginx:1.21-alpine
 COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf

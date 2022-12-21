@@ -8,8 +8,6 @@ pipeline {
         kubernetesToken = credentials('k8s-token')
         dockerhubUsername = "cronozok"
         registryCredential = "dockerhub_id"
-        webappBack = 'tpidevopsdespuesvemospublic-back:'
-        webappFront = 'tpidevopsdespuesvemospublic-front:'
         webappBackPodman = 'tpidevopsdespuesvemospublic-back:'
         webappFrontPodman = 'tpidevopsdespuesvemospublic-front:'
         dockerhubPassword = credentials('dockerhub_password')
@@ -26,25 +24,10 @@ pipeline {
                 stage('Back-end') {
                     steps {
                         echo 'Building back-end...'
-                        /* container('docker') {
-                            script {
-                                webappBack = docker.build("${dockerhubUsername}/${webappBack}${BUILD_NUMBER}", "./backend")
-                                docker.withRegistry('https://registry.hub.docker.com', registryCredential) { 
-                                    if (env.BRANCH_NAME == 'main') {
-                                        webappBack.push('latest')
-                                    }
-                                    if (env.BRANCH_NAME == 'dev') {
-                                        webappBack.push()
-                                        webappBack.push('dev')
-                                    }
-                                }
-                            }
-                        } */
                         container('podman') {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
-                                sh 'podman network create'
-                                sh 'cd backend && podman build --dns 8.8.8.8 -t ${webappBackPodman}${BUILD_NUMBER} .'
+                                sh 'cd backend && npm i && npm run build && podman build -t ${webappBackPodman}${BUILD_NUMBER} .'
                                 if (env.BRANCH_NAME == 'main') {
                                     sh 'podman push ${webappBackPodman} docker.io/${dockerhubUsername}/${webappBackPodman}:latest'
                                 }
@@ -58,33 +41,15 @@ pipeline {
                 stage('Front-end') {
                     steps {
                         echo 'Building front-end...'
-                        /* container('docker') {
-                            script {
-                                if (env.BRANCH_NAME == 'main') {
-                                    webappFront = docker.build("${dockerhubUsername}/${webappFront}${BUILD_NUMBER}", "--build-arg STAGE=prod ./frontend")
-                                    docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
-                                        webappFront.push('latest')
-                                    }
-                                }
-                                if (env.BRANCH_NAME == 'dev') {
-                                    webappFront = docker.build("${dockerhubUsername}/${webappFront}${BUILD_NUMBER}", "--build-arg STAGE=dev ./frontend")
-                                    docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
-                                        webappFront.push()
-                                        webappFront.push('dev')
-                                    }
-                                }
-                            }
-                        } */
                         container('podman') {
                             script {
-                                sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
-                                sh 'podman network create'
+                                sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'                                
                                 if (env.BRANCH_NAME == 'main') {
-                                    sh 'cd frontend && podman build -t ${webappFrontPodman}${BUILD_NUMBER} --dns 8.8.8.8 --build-arg=STAGE=prod .'
+                                    sh 'cd frontend && npm i && npm run build && podman build -t ${webappFrontPodman}${BUILD_NUMBER} --build-arg=STAGE=prod .'
                                     sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:latest'
                                 }
                                 if (env.BRANCH_NAME == 'dev') {
-                                    sh 'cd frontend && podman build -t ${webappFrontPodman}${BUILD_NUMBER} --build-arg=STAGE=dev .'
+                                    sh 'cd frontend && npm i && npm run build && podman build -t ${webappFrontPodman}${BUILD_NUMBER} --build-arg=STAGE=dev .'
                                     sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:dev'
                                 }
                             }
