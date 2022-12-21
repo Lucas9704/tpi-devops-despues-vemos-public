@@ -107,7 +107,7 @@ spec:
         app: webapp-back
     spec:
       containers:
-        - image: leosebas065/tpidevopsdespuesvemospublic-back
+        - image: docker.io/leosebas065/tpidevopsdespuesvemospublic-back
           imagePullPolicy: Always
           name: tpidevopsdespuesvemospublic-back
           env:
@@ -156,7 +156,7 @@ spec:
         app: webapp-front
     spec:
       containers:
-        - image: leosebas065/tpidevopsdespuesvemospublic-front
+        - image: docker.io/leosebas065/tpidevopsdespuesvemospublic-front
           imagePullPolicy: Always
           name: tpidevopsdespuesvemospublic-front
           ports:
