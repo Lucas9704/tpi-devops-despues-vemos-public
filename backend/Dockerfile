@@ -1,6 +1,5 @@
 FROM node:lts as build
 WORKDIR /usr/src/app
-COPY . .
-RUN npm install
+COPY /build .
 CMD node server.js
 EXPOSE 9000
