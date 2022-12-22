@@ -116,7 +116,7 @@ spec:
         app: webapp-back
     spec:
       containers:
-        - image: docker.io/leosebas065/tpidevopsdespuesvemospublic-back:dev
+        - image: docker.io/cronozok/tpidevopsdespuesvemospublic-back:dev
           imagePullPolicy: Always
           name: tpidevopsdespuesvemospublic-back
           env:

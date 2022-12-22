@@ -8,8 +8,8 @@ pipeline {
         kubernetesToken = credentials('k8s-token')
         dockerhubUsername = "cronozok"
         registryCredential = "dockerhub_id"
-        webappBackPodman = 'tpidevopsdespuesvemospublic-back:'
-        webappFrontPodman = 'tpidevopsdespuesvemospublic-front:'
+        webappBackPodman = 'tpidevopsdespuesvemospublic-back'
+        webappFrontPodman = 'tpidevopsdespuesvemospublic-front'
         dockerhubPassword = credentials('dockerhub_password')
 		/* db_host_prod = credentials('db_host_prod')
 		db_host_dev = credentials('db_host_dev')
@@ -20,23 +20,10 @@ pipeline {
     }
     stages {
         stage('BuildProjects') {
-            parallel {
-                stage('Back-End') {
-                    steps {
-                        container('node') {
-                            script {
-                                sh 'cd backend && npm i && npm run build'
-                            }
-                        }
-                    }
-                }
-                stage('Front-End') {
-                    steps {
-                        container('node') {
-                            script {
-                                sh 'cd frontend && npm i && npm run build'
-                            }
-                        }
+            steps {
+                container('node') {
+                    script {
+                        sh 'cd backend && npm i && npm run build'
                     }
                 }
             }
@@ -49,30 +36,12 @@ pipeline {
                         container('podman') {
                             script {
                                 sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'
-                                sh 'cd backend && podman build -t ${webappBackPodman}${BUILD_NUMBER} .'
+                                sh 'cd backend && podman build -t ${webappBackPodman}:${BUILD_NUMBER} .'
                                 if (env.BRANCH_NAME == 'main') {
-                                    sh 'podman push ${webappBackPodman} docker.io/${dockerhubUsername}/${webappBackPodman}:latest'
+                                    sh 'podman push ${webappBackPodman}:${BUILD_NUMBER} docker.io/${dockerhubUsername}/${webappBackPodman}:latest'
                                 }
                                 if (env.BRANCH_NAME == 'dev') {
-                                    sh 'podman push ${webappBackPodman} docker.io/${dockerhubUsername}/${webappBackPodman}:dev'
-                                }
-                            }
-                        }
-                    }
-                }
-                stage('Front-end') {
-                    steps {
-                        echo 'Building front-end...'
-                        container('podman') {
-                            script {
-                                sh 'podman login -u ${dockerhubUsername} -p ${dockerhubPassword} docker.io'                                
-                                if (env.BRANCH_NAME == 'main') {
-                                    sh 'cd frontend && podman build -t ${webappFrontPodman}${BUILD_NUMBER} .'
-                                    sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:latest'
-                                }
-                                if (env.BRANCH_NAME == 'dev') {
-                                    sh 'cd frontend && podman build -t ${webappFrontPodman}${BUILD_NUMBER} .'
-                                    sh 'podman push ${webappFrontPodman} docker.io/${dockerhubUsername}/${webappFrontPodman}:dev'
+                                    sh 'podman push ${webappBackPodman}:${BUILD_NUMBER} docker.io/${dockerhubUsername}/${webappBackPodman}:dev'
                                 }
                             }
                         }
@@ -82,9 +51,6 @@ pipeline {
         }
         stage('Database-migration') {
             steps {
-                script {
-                    sh 'git clone https://github.com/devops-frre/tpi-2022-despues-vemos.git'
-                }
                 echo 'Updating database...'
                 container('flyway') {
                     script {
