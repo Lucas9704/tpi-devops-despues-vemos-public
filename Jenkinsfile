@@ -21,21 +21,19 @@ pipeline {
     stages {
         stage('BuildProjects') {
             parallel {
-                stage('Back-End') {
+                stage('Back-end') {
                     steps {
-                        container('node') {
-                            script {
-                                sh 'cd backend && npm i && npm run build'
-                            }
+                        echo 'Building back-end...'
+                        script {
+                            sh 'cd backend && npm install && npm run build'
                         }
                     }
                 }
-                stage('Front-End') {
+                stage('Front-end') {
                     steps {
-                        container('node') {
-                            script {
-                                sh 'cd frontend && npm i && npm run build'
-                            }
+                        echo 'Building front-end...'
+                        script {
+                            sh 'cd frontend && npm install && npm run build'
                         }
                     }
                 }
