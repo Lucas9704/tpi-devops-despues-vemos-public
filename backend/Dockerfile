@@ -1,6 +1,6 @@
-FROM node:lts as build
+FROM node:lts-alpine as build
 WORKDIR /usr/src/app
-COPY . .
-RUN npm install
-CMD node server.js
+COPY package*.json ./
+COPY /dist ./dist
+CMD npm start
 EXPOSE 9000
