@@ -178,14 +178,12 @@ metadata:
   namespace: tp-devops-dev
   name: service-front
 spec:
-  type: LoadBalancer
   selector:
     app: webapp-front
   ports:
     - protocol: TCP
-      port: 3000
+      port: 80
       targetPort: 3000
-      nodePort: 30300
 ---
 apiVersion: v1
 kind: Service
@@ -193,12 +191,10 @@ metadata:
   namespace: tp-devops-dev
   name: service-back
 spec:
-  type: LoadBalancer
   ports:
     - protocol: TCP
       port: 9000
       targetPort: 9000
-      nodePort: 30900
   selector:
     app: webapp-back
 ---
@@ -221,18 +217,11 @@ spec:
                 name: service-front
                 port:
                   number: 80
+          - path: /dev/api
+            pathType: Exact
+            backend:
+              service:
+                name: service-back
+                port:
+                  number: 9000
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx-ingress-front
-  namespace: tp-devops-dev
-spec:
-  type: NodePort
-  ports:
-  - port: 80
-    targetPort: 80
-    nodePort: 30301
-    protocol: TCP
-  selector:
-    app: ingress-webapp
