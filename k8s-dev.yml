@@ -23,6 +23,11 @@ spec:
       - image: mysql:8
         name: mysql
         env:
+        - name: MYSQL_URL
+          valueFrom:
+            configMapKeyRef:
+              name: endpoints
+              key: DB_URL
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -61,21 +66,24 @@ metadata:
   name: mysql
   namespace: tp-devops-dev
 spec:
+  type: NodePort
   ports:
   - port: 3306
+    targetPort: 3306
+    nodePort: 30306
   selector:
     app: mysql
-  clusterIP: None
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: db-credentials
+  name: mysql-root-password
   namespace: tp-devops-dev
 type: Opaque
 data:
-  MYSQL_ROOT_PASSWORD: password
-  # devops
+  # password
+  MYSQL_ROOT_PASSWORD: cGFzc3dvcmQ=
+  # prueba
   MYSQL_DATABASE: cHJ1ZWJh
   # elon
   MYSQL_USER: ZWxvbg==
@@ -89,6 +97,7 @@ metadata:
   name: endpoints
 data:
   DB_PORT: '3306'
+  DB_URL: 'mysql.db'
   HOST_ENV: 'dev'
 ---
 apiVersion: apps/v1
@@ -119,17 +128,17 @@ spec:
             - name: MYSQL_DATABASE
               valueFrom:
                 secretKeyRef:
-                  name: db-credentials
+                  name: mysql-root-password
                   key: MYSQL_DATABASE
             - name: MYSQL_USER
               valueFrom:
                 secretKeyRef:
-                  name: db-credentials
+                  name: mysql-root-password
                   key: MYSQL_USER
             - name: MYSQL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: db-credentials
+                  name: mysql-root-password
                   key: MYSQL_ROOT_PASSWORD
             - name: HOST_ENV
               valueFrom:
@@ -169,13 +178,14 @@ metadata:
   namespace: tp-devops-dev
   name: service-front
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app: webapp-front
   ports:
     - protocol: TCP
       port: 3000
       targetPort: 3000
+      nodePort: 30300
 ---
 apiVersion: v1
 kind: Service
@@ -183,10 +193,12 @@ metadata:
   namespace: tp-devops-dev
   name: service-back
 spec:
+  type: LoadBalancer
   ports:
     - protocol: TCP
       port: 9000
       targetPort: 9000
+      nodePort: 30900
   selector:
     app: webapp-back
 ---
@@ -196,30 +208,31 @@ metadata:
   namespace: tp-devops-dev
   name: ingress-webapp
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /dev
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
   rules:
     - http:
         paths:
           - path: /dev
-            pathType: Prefix
+            pathType: Exact
             backend:
               service:
                 name: service-front
                 port:
-                  number: 3000
+                  number: 80
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: v1
+kind: Service
 metadata:
-  name: ingress-backend
+  name: nginx-ingress-front
   namespace: tp-devops-dev
 spec:
-  rules:
-  - host: localhost
-    http:
-      paths:
-      - backend:
-          serviceName: service-back
-          servicePort: 9000
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30301
+    protocol: TCP
+  selector:
+    app: ingress-webapp
