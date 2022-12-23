@@ -60,9 +60,9 @@ pipeline {
                             sh 'flyway info -url="jdbc:mysql://10.96.0.102:3306/prueba" -user=root -password=password'
                         }
                         if (env.BRANCH_NAME == 'dev' ) {
-                            sh 'flyway info -url="jdbc:mysql://10.96.0.101:3306/prueba" -user=root -password=password'
-                            sh 'flyway migrate -locations=filesystem:scripts -url="jdbc:mysql://10.96.0.101:3306/prueba" -user=root -password=password'
-                            sh 'flyway info -url="jdbc:mysql://10.96.0.101:3306/prueba" -user=root -password=password'
+                            sh 'flyway info -url="jdbc:mysql://tp-devops-dev.mysql.svc.cluster.local:3306/prueba" -user=root -password=password'
+                            sh 'flyway migrate -locations=filesystem:scripts -url="jdbc:mysql://tp-devops-dev.mysql.svc.cluster.local:3306/prueba" -user=root -password=password'
+                            sh 'flyway info -url="jdbc:mysql://tp-devops-dev.mysql.svc.cluster.local:3306/prueba" -user=root -password=password'
                         }
                     }
                 }
