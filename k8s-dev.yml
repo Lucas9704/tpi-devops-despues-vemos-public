@@ -83,8 +83,8 @@ data:
   MYSQL_ROOT_PASSWORD: cGFzc3dvcmQ=
   # prueba
   MYSQL_DATABASE: cHJ1ZWJh
-  # elon
-  MYSQL_USER: ZWxvbg==
+  # root
+  MYSQL_USER: cm9vdA==
   # musk
   MYSQL_PASSWORD: bXVzaw==
 ---
