@@ -220,7 +220,7 @@ spec:
                 name: service-front
                 port:
                   number: 3000
-          - path: /dev-api/(.+)
+          - path: /dev-api(.+)
             pathType: Prefix
             backend:
               service:
