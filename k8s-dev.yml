@@ -213,13 +213,6 @@ spec:
   rules:
     - http:
         paths:
-          - path: /dev
-            pathType: Prefix
-            backend:
-              service:
-                name: service-front
-                port:
-                  number: 3000
           - path: /dev-api/(.+)
             pathType: Prefix
             backend:
