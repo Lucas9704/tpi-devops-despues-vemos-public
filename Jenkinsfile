@@ -19,7 +19,7 @@ pipeline {
 		db_db = credentials('db_db') */
     }
     stages {
-        stage('BuildProjects') {
+        /*stage('BuildProjects') {
             steps {
                 container('node') {
                     script {
@@ -48,7 +48,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
         stage('Database-migration') {
             steps {
                 echo 'Updating database...'
