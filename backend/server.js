@@ -22,7 +22,14 @@ app.use(cors())
 
 // routes -------------------------------------------
 app.get('/', (req, res)=>{
-    res.send('Welcome to my API despues vemos')
+    res.send({
+        message:'Welcome to my API despues vemos',
+        DB_HOST: process.env.HOST_ENV,
+        DB_USER: process.env.MYSQL_USER,
+        DB_PASS: process.env.MYSQL_PASSWORD,
+        DB_NAME: process.env.MYSQL_DATABASE,
+        DB_URL: process.env.DB_URL
+    })
 })
 app.use('/api', routes)
 

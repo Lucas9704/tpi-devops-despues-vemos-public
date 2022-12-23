@@ -97,7 +97,7 @@ metadata:
   name: endpoints
 data:
   DB_PORT: '3306'
-  DB_URL: 'mysql.db'
+  DB_URL: 'tpi-devops-dev.mysql.svc.cluster.local'
   HOST_ENV: 'dev'
 ---
 apiVersion: apps/v1
@@ -145,6 +145,11 @@ spec:
                 configMapKeyRef:
                   name: endpoints
                   key: HOST_ENV
+            - name: DB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: endpoints
+                  key: DB_URL
           ports:
             - containerPort: 9000
               name: webapp-back
