@@ -49,7 +49,7 @@ pipeline {
                 }
             }
         }*/
-        stage('Database-migration') {
+        /*stage('Database-migration') {
             steps {
                 echo 'Updating database...'
                 container('flyway') {
@@ -67,7 +67,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
         stage('Deploy') {
             steps {
                 echo 'Deploying...'
