@@ -13,10 +13,10 @@ pipeline {
         dockerhubPassword = credentials('dockerhub_password')
 		db_host_prod = credentials('db_host_prod')
 		db_host_dev = credentials('db_host_dev')
-		/* db_port = credentials('db_port')
+		db_port = credentials('db_port')
 		db_user = credentials('db_user')
 		db_pass = credentials('db_pass')
-		db_db = credentials('db_db') */
+		db_db = credentials('db_db')
     }
     stages {
         stage('BuildProjects') {
@@ -55,14 +55,14 @@ pipeline {
                 container('flyway') {
                     script {
                         if (env.BRANCH_NAME == 'main') {
-                            sh 'flyway info -url="jdbc:mysql://${db_host_prod}:3306/prueba" -user=root -password=password'
-                            sh 'flyway migrate -locations=filesystem:scripts -url="jdbc:mysql://${db_host_prod}:3306/prueba" -user=root -password=password'
-                            sh 'flyway info -url="jdbc:mysql://${db_host_prod}:3306/prueba" -user=root -password=password'
+                            sh 'flyway info -url="jdbc:mysql://${db_host_prod}:${db_port}/${db_db}" -user=${db_user} -password=${db_pass}'
+                            sh 'flyway migrate -locations=filesystem:scripts -url="jdbc:mysql://${db_host_prod}:${db_port}/${db_db}" -user=${db_user} -password=${db_pass}'
+                            sh 'flyway info -url="jdbc:mysql://${db_host_prod}:${db_port}/${db_db}" -user=${db_user} -password=${db_pass}'
                         }
                         if (env.BRANCH_NAME == 'dev' ) {
-                            sh 'flyway info -url="jdbc:mysql://${db_host_dev}:3306/prueba" -user=root -password=password'
-                            sh 'flyway migrate -locations=filesystem:scripts -url="jdbc:mysql://${db_host_dev}:3306/prueba" -user=root -password=password'
-                            sh 'flyway info -url="jdbc:mysql://${db_host_dev}:3306/prueba" -user=root -password=password'
+                            sh 'flyway info -url="jdbc:mysql://${db_host_dev}:${db_port}/${db_db}" -user=${db_user} -password=${db_pass}'
+                            sh 'flyway migrate -locations=filesystem:scripts -url="jdbc:mysql://${db_host_dev}:${db_port}/${db_db}" -user=${db_user} -password=${db_pass}'
+                            sh 'flyway info -url="jdbc:mysql://${db_host_dev}:${db_port}/${db_db}" -user=${db_user} -password=${db_pass}'
                         }
                     }
                 }
