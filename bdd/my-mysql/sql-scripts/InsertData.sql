@@ -10,3 +10,5 @@ VALUES (3, 'DEVOPS');
 INSERT INTO leccion (IdLeccion, Nombre)
 VALUES (4, 'RECURSOS');
 
+
+
