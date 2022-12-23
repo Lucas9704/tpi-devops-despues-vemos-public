@@ -60,9 +60,9 @@ pipeline {
                             sh 'flyway info -url="jdbc:mysql://${db_host_prod}:${db_port}/${db_db}" -user=${db_user} -password=${db_pass}'
                         }
                         if (env.BRANCH_NAME == 'dev' ) {
-                            sh 'flyway info -url="jdbc:mysql://10.96.0.101:3306/${db_db}" -user=${db_user} -password=${db_pass}'
-                            sh 'flyway migrate -locations=filesystem:scripts -url="jdbc:mysql://10.96.0.101:3306/${db_db}" -user=${db_user} -password=${db_pass}'
-                            sh 'flyway info -url="jdbc:mysql://10.96.0.101:3306/${db_db}" -user=${db_user} -password=${db_pass}'
+                            sh 'flyway info -url="jdbc:mysql://${db_host_dev}:${db_port}/${db_db}" -user=${db_user} -password=${db_pass}'
+                            sh 'flyway migrate -locations=filesystem:scripts -url="jdbc:mysql://${db_host_dev}:${db_port}/${db_db}" -user=${db_user} -password=${db_pass}'
+                            sh 'flyway info -url="jdbc:mysql://${db_host_dev}:${db_port}/${db_db}" -user=${db_user} -password=${db_pass}'
                         }
                     }
                 }
