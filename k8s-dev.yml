@@ -57,7 +57,7 @@ spec:
       volumes:
       - name: mysql-persistent-storage
         hostPath:
-          path: /home/elon/mysql
+          path: /home/elon/mysql-dev
           type: Directory
 ---
 apiVersion: v1
@@ -66,13 +66,12 @@ metadata:
   name: mysql
   namespace: tp-devops-dev
 spec:
-  type: NodePort
   ports:
   - port: 3306
     targetPort: 3306
-    nodePort: 30306
   selector:
     app: mysql
+  clusterIP: 10.96.0.101
 ---
 apiVersion: v1
 kind: Secret
@@ -97,7 +96,7 @@ metadata:
   name: endpoints
 data:
   DB_PORT: '3306'
-  DB_URL: 'tpi-devops-dev.mysql.svc.cluster.local'
+  DB_URL: '10.96.0.101'
   HOST_ENV: 'dev'
 ---
 apiVersion: apps/v1
@@ -209,21 +208,21 @@ metadata:
   namespace: tp-devops-dev
   name: ingress-webapp
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
 spec:
   ingressClassName: nginx
   rules:
     - http:
         paths:
           - path: /dev
-            pathType: Exact
+            pathType: Prefix
             backend:
               service:
                 name: service-front
                 port:
                   number: 3000
-          - path: /dev/api
-            pathType: Exact
+          - path: /dev-api/(.+)
+            pathType: Prefix
             backend:
               service:
                 name: service-back

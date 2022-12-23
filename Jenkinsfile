@@ -11,9 +11,9 @@ pipeline {
         webappBackPodman = 'tpidevopsdespuesvemospublic-back'
         webappFrontPodman = 'tpidevopsdespuesvemospublic-front'
         dockerhubPassword = credentials('dockerhub_password')
-		/* db_host_prod = credentials('db_host_prod')
+		db_host_prod = credentials('db_host_prod')
 		db_host_dev = credentials('db_host_dev')
-		db_port = credentials('db_port')
+		/* db_port = credentials('db_port')
 		db_user = credentials('db_user')
 		db_pass = credentials('db_pass')
 		db_db = credentials('db_db') */
@@ -54,9 +54,16 @@ pipeline {
                 echo 'Updating database...'
                 container('flyway') {
                     script {
-                        sh 'flyway info -url="jdbc://tpi-devops-dev.mysql.svc.cluster.local:3306/prueba" -user=root -password=password'
-                        sh 'flyway migrate -locations=filesystem:scripts -url="jdbc://tpi-devops-dev.mysql.svc.cluster.local:3306/prueba" -user=root -password=password'
-                        sh 'flyway info -url="jdbc://tpi-devops-dev.mysql.svc.cluster.local:3306/prueba" -user=root -password=password'
+                        if (env.BRANCH_NAME == 'main') {
+                            sh 'flyway info -url="jdbc:mysql://${db_host_prod}:3306/prueba" -user=root -password=password'
+                            sh 'flyway migrate -locations=filesystem:scripts -url="jdbc:mysql://${db_host_prod}:3306/prueba" -user=root -password=password'
+                            sh 'flyway info -url="jdbc:mysql://${db_host_prod}:3306/prueba" -user=root -password=password'
+                        }
+                        if (env.BRANCH_NAME == 'dev' ) {
+                            sh 'flyway info -url="jdbc:mysql://${db_host_dev}:3306/prueba" -user=root -password=password'
+                            sh 'flyway migrate -locations=filesystem:scripts -url="jdbc:mysql://${db_host_dev}:3306/prueba" -user=root -password=password'
+                            sh 'flyway info -url="jdbc:mysql://${db_host_dev}:3306/prueba" -user=root -password=password'
+                        }
                     }
                 }
             }
