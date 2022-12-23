@@ -165,7 +165,7 @@ spec:
         app: webapp-front
     spec:
       containers:
-        - image: docker.io/leosebas065/tpidevopsdespuesvemospublic-front:dev
+        - image: docker.io/cronozok/tpidevopsdespuesvemospublic-front:latest
           imagePullPolicy: Always
           name: tpidevopsdespuesvemospublic-front
           ports:
@@ -182,7 +182,7 @@ spec:
     app: webapp-front
   ports:
     - protocol: TCP
-      port: 80
+      port: 3000
       targetPort: 3000
 ---
 apiVersion: v1
@@ -216,7 +216,7 @@ spec:
               service:
                 name: service-front
                 port:
-                  number: 80
+                  number: 3000
           - path: /dev/api
             pathType: Exact
             backend:
